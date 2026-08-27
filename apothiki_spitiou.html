@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Inventory</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Playwrite+CA&display=swap');
+
+:root{
+  --bg: #1f2a38;
+  --surface: #29394c;
+  --surface-2: #324459;
+  --line: #3d5069;
+  --accent: #c9a227;
+  --accent-dim: #8f7622;
+  --text: #f2efea;
+  --muted: #9fb0c3;
+  --ok: #7a8b69;
+  --ok-bg: #7a8b6926;
+  --low: #d68a3c;
+  --low-bg: #d68a3c26;
+  --empty: #c15c50;
+  --empty-bg: #c15c5026;
+  --radius: 10px;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+*{ box-sizing: border-box; }
+
+html, body{
+  margin:0;
+  height: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+body, .root-wrap{
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+.root-wrap{
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.app{
+  background: var(--bg);
+  padding: 40px 24px 60px;
+  max-width: 760px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.header{
+  display:flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.header h1{
+  font-family: 'Playwrite CA', cursive;
+  font-weight: 400;
+  font-size: 30px;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.2px;
+  color: var(--accent);
+}
+
+.header .sub{
+  color: var(--muted);
+  font-size: 13px;
+  margin:0;
+}
+
+.header .eyebrow{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 6px 0;
+}
+
+.btn{
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13.5px;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease;
+}
+.btn:active{ transform: scale(0.97); }
+.btn-primary{ background: var(--accent); color: #1f2a38; }
+.btn-primary:hover{ background: #ddb640; }
+.btn-ghost{ background: transparent; color: var(--muted); border: 1px solid var(--line); }
+.btn-ghost:hover{ color: var(--text); border-color: var(--muted); }
+.btn-small{ padding: 6px 10px; font-size: 12px; }
+
+.toolbar{
+  display:flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search{
+  flex: 1;
+  min-width: 160px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+}
+.search::placeholder{ color: var(--muted); }
+.search:focus{ outline: 2px solid var(--accent); outline-offset: -1px; }
+
+.shopping-banner{
+  background: linear-gradient(90deg, var(--low-bg), transparent);
+  border: 1px solid var(--low);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  display: none;
+}
+.shopping-banner.show{ display: block; }
+.shopping-banner .title{
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--low);
+  margin: 0 0 8px 0;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.shopping-banner ul{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.shopping-banner li{
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+.shopping-banner li b{ font-family: var(--font-mono); color: var(--accent); }
+.shopping-banner li .price-bit{ font-family: var(--font-mono); font-size: 11px; margin-left: 2px; }
+
+.category{
+  margin-bottom: 22px;
+}
+
+.category-label{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.category-label .bracket{
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 13px;
+}
+.category-label h2{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+  color: var(--text);
+}
+.category-label .count{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.item-row{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.item-info .name{
+  font-weight: 600;
+  font-size: 14.5px;
+  margin-bottom: 6px;
+}
+
+.gauge{
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  overflow: visible;
+}
+.gauge-fill{
+  position: absolute;
+  left:0; top:0; bottom:0;
+  border-radius: 4px;
+  transition: width .2s ease;
+}
+.gauge-threshold{
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--muted);
+  opacity: 0.6;
+}
+
+.stepper{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  font-family: var(--font-mono);
+}
+.stepper button{
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+  line-height: 1;
+}
+.stepper button:hover{ border-color: var(--accent); color: var(--accent); }
+.stepper .val{
+  min-width: 34px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.stepper .unit{
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.status-pill{
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  text-align: center;
+}
+.status-ok{ background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok); }
+.status-low{ background: var(--low-bg); color: var(--low); border: 1px solid var(--low); }
+.status-empty{ background: var(--empty-bg); color: var(--empty); border: 1px solid var(--empty); }
+
+.row-actions{
+  display:flex;
+  gap: 6px;
+}
+.icon-btn{
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+}
+.icon-btn:hover{ color: var(--empty); }
+.icon-btn.buy-btn:hover{ color: var(--accent); }
+
+.price-info{
+  color: var(--muted);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  margin-top: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.price-info:hover{ color: var(--accent); }
+.price-info .no-price{ font-style: italic; opacity: 0.7; }
+
+.history-summary{
+  display: flex;
+  gap: 18px;
+  margin-bottom: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.history-summary b{ color: var(--accent); font-size: 13px; }
+
+.history-list{
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.history-row{
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 10px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+}
+.history-row:last-child{ border-bottom: none; }
+.history-row .h-date{ color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+.history-row .h-qty{ color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+.history-row .h-unit{ font-family: var(--font-mono); font-weight: 600; }
+.history-row .h-total{ font-family: var(--font-mono); color: var(--muted); font-size: 11.5px; }
+.history-empty{
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 10px;
+}
+
+.empty-state{
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--muted);
+}
+.empty-state .big{
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.modal-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(10,14,20,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+.modal-backdrop.show{ display:flex; }
+.modal{
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  width: 100%;
+  max-width: 380px;
+}
+.modal h3{
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0 0 16px 0;
+}
+.field{ margin-bottom: 12px; }
+.field label{
+  display:block;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field input, .field select{
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px 10px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+}
+.field input:focus, .field select:focus{ outline: 2px solid var(--accent); outline-offset: -1px; }
+.field-row{ display:flex; gap: 10px; }
+.field-row .field{ flex: 1; }
+.modal-actions{
+  display:flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.loading{
+  text-align:center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.footer-note{
+  text-align:center;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 18px;
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 480px){
+  .item-row{ grid-template-columns: 1fr; }
+  .row-actions{ justify-self: flex-end; }
+}
+</style>
+
+<div class="root-wrap">
+  <div class="app" id="app">
+    <div class="loading" id="loading">Φόρτωση αποθήκης…</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const CATEGORIES = [
+    "Μπάνιο",
+    "Κουζίνα",
+    "Γραφείο",
+    "Σαλόνι",
+    "Μπαλκόνι",
+    "Δωμάτιο",
+    "Άλλο"
+  ];
+  const STORAGE_KEY = "household-inventory-items";
+  let items = [];
+  let editingId = null;
+  let searchTerm = "";
+  let loaded = false;
+
+  const appEl = document.getElementById('app');
+
+  function uid(){ return 'it_' + Math.random().toString(36).slice(2,10); }
+
+  function statusOf(item){
+    if(item.current <= 0) return 'empty';
+    if(item.current <= item.par) return 'low';
+    return 'ok';
+  }
+
+  function statusLabel(s){
+    return s === 'empty' ? 'Εξαντλήθηκε' : s === 'low' ? 'Χαμηλό' : 'Επαρκές';
+  }
+
+  const hasAccountStorage = (typeof window.storage !== 'undefined' && window.storage !== null);
+  const SYNC_URL_KEY = "household-inventory-sync-url";
+  let syncStatus = 'idle'; // idle | ok | error
+
+  function getSyncUrl(){
+    try{ return localStorage.getItem(SYNC_URL_KEY) || ''; }catch(e){ return ''; }
+  }
+
+  function setSyncUrl(url){
+    try{
+      if(url) localStorage.setItem(SYNC_URL_KEY, url);
+      else localStorage.removeItem(SYNC_URL_KEY);
+    }catch(e){}
+  }
+
+  // Διαβάζει δεδομένα από το Apps Script μέσω JSONP (<script> tag), ώστε να
+  // δουλεύει ακόμη και όταν το αρχείο ανοίγεται τοπικά (file://) όπου το CORS
+  // μπλοκάρει τα κανονικά fetch() αιτήματα.
+  function jsonpFetch(url, timeoutMs){
+    return new Promise((resolve, reject) => {
+      const cbName = 'jsonp_cb_' + Math.random().toString(36).slice(2);
+      const script = document.createElement('script');
+      let settled = false;
+
+      function cleanup(){
+        delete window[cbName];
+        if(script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[cbName] = (data) => {
+        if(settled) return;
+        settled = true;
+        cleanup();
+        resolve(data);
+      };
+
+      script.onerror = () => {
+        if(settled) return;
+        settled = true;
+        cleanup();
+        reject(new Error('JSONP: αποτυχία φόρτωσης'));
+      };
+
+      const sep = url.includes('?') ? '&' : '?';
+      script.src = url + sep + 'callback=' + cbName + '&_ts=' + Date.now();
+      document.body.appendChild(script);
+
+      setTimeout(() => {
+        if(settled) return;
+        settled = true;
+        cleanup();
+        reject(new Error('JSONP: λήξη χρόνου αναμονής'));
+      }, timeoutMs || 10000);
+    });
+  }
+
+  // Στέλνει δεδομένα μέσω κρυφής φόρμας/iframe αντί για fetch(), ώστε να μην
+  // εφαρμόζεται CORS (οι υποβολές φορμών δεν μπλοκάρονται όπως τα fetch).
+  function submitViaHiddenForm(url, dataStr, timeoutMs){
+    return new Promise((resolve) => {
+      const iframeName = 'sync_frame_' + Math.random().toString(36).slice(2);
+      const iframe = document.createElement('iframe');
+      iframe.name = iframeName;
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = url;
+      form.target = iframeName;
+      form.style.display = 'none';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'data';
+      input.value = dataStr;
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        if(form.parentNode) form.parentNode.removeChild(form);
+        if(iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        resolve(true);
+      }, timeoutMs || 1500);
+    });
+  }
+
+  async function loadItems(){
+    const syncUrl = getSyncUrl();
+    try{
+      if(syncUrl){
+        const data = await jsonpFetch(syncUrl);
+        items = Array.isArray(data) ? data : [];
+        syncStatus = 'ok';
+        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }catch(e){}
+      } else if(hasAccountStorage){
+        const res = await window.storage.get(STORAGE_KEY, false);
+        items = res && res.value ? JSON.parse(res.value) : [];
+      } else {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        items = raw ? JSON.parse(raw) : [];
+      }
+    }catch(e){
+      console.error('Αποτυχία φόρτωσης από Google Sheets, χρήση τοπικού αντιγράφου', e);
+      syncStatus = 'error';
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        items = raw ? JSON.parse(raw) : [];
+      }catch(e2){ items = []; }
+    }
+    loaded = true;
+    render();
+  }
+
+  async function saveItems(){
+    const syncUrl = getSyncUrl();
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }catch(e){}
+    try{
+      if(syncUrl){
+        await submitViaHiddenForm(syncUrl, JSON.stringify(items));
+        syncStatus = 'ok';
+      } else if(hasAccountStorage){
+        await window.storage.set(STORAGE_KEY, JSON.stringify(items), false);
+      }
+    }catch(e){
+      console.error('Αποτυχία συγχρονισμού με Google Sheets', e);
+      syncStatus = 'error';
+    }
+  }
+
+  function addItem(data){
+    items.push({
+      id: uid(),
+      name: data.name,
+      category: data.category,
+      unit: data.unit || 'τεμ.',
+      current: Number(data.current) || 0,
+      par: Number(data.par) || 1,
+      buyQty: Number(data.buyQty) || Number(data.par) || 1,
+      priceHistory: []
+    });
+    saveItems();
+    render();
+  }
+
+  function updateItem(id, patch){
+    const it = items.find(i => i.id === id);
+    if(it) Object.assign(it, patch);
+    saveItems();
+    render();
+  }
+
+  function deleteItem(id){
+    items = items.filter(i => i.id !== id);
+    saveItems();
+    render();
+  }
+
+  function changeStock(id, delta){
+    const it = items.find(i => i.id === id);
+    if(!it) return;
+    it.current = Math.max(0, it.current + delta);
+    saveItems();
+    render();
+  }
+
+  // Κρατάμε μόνο τις αγορές των τελευταίων 24 μηνών
+  function pruneHistory(item){
+    if(!item.priceHistory) { item.priceHistory = []; return; }
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - 24);
+    item.priceHistory = item.priceHistory.filter(e => new Date(e.date) >= cutoff);
+  }
+
+  function logPurchase(id, data){
+    const it = items.find(i => i.id === id);
+    if(!it) return;
+    if(!it.priceHistory) it.priceHistory = [];
+    const qty = Number(data.qty) || 0;
+    const total = Number(data.total) || 0;
+    const unit = qty > 0 ? total / qty : total;
+    it.priceHistory.push({ date: data.date, qty, total, unit });
+    it.priceHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
+    it.current = Math.max(0, it.current + qty);
+    pruneHistory(it);
+    saveItems();
+    render();
+  }
+
+  function lastPurchase(item){
+    pruneHistory(item);
+    if(!item.priceHistory || item.priceHistory.length === 0) return null;
+    return item.priceHistory[item.priceHistory.length - 1];
+  }
+
+  function avgUnitPrice(item){
+    pruneHistory(item);
+    if(!item.priceHistory || item.priceHistory.length === 0) return null;
+    const sum = item.priceHistory.reduce((s,e) => s + e.unit, 0);
+    return sum / item.priceHistory.length;
+  }
+
+  function formatDate(d){
+    const dt = new Date(d);
+    return dt.toLocaleDateString('el-GR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  function formatMoney(n){
+    return n.toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€';
+  }
+
+  function openModal(item){
+    editingId = item ? item.id : null;
+    const isEdit = !!item;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop show';
+    backdrop.id = 'modalBackdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h3 style="${isEdit ? '' : `font-family:'Playwrite CA',cursive; font-weight:400; color: var(--accent);`}">${isEdit ? 'Επεξεργασία είδους' : 'New Item'}</h3>        <div class="field">
+          <label>Όνομα</label>
+          <input type="text" id="f-name" value="${item ? escapeAttr(item.name) : ''}" placeholder="π.χ. Απορρυπαντικό πιάτων" />
+        </div>
+        <div class="field">
+          <label>Κατηγορία</label>
+          <select id="f-category">
+            ${CATEGORIES.map(c => `<option value="${c}" ${item && item.category===c ? 'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Τρέχον απόθεμα</label>
+            <input type="number" min="0" id="f-current" value="${item ? item.current : 0}" />
+          </div>
+          <div class="field">
+            <label>Μονάδα</label>
+            <input type="text" id="f-unit" value="${item ? escapeAttr(item.unit) : 'τεμ.'}" placeholder="τεμ., ρολά, lt" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Ελάχιστο όριο</label>
+            <input type="number" min="0" id="f-par" value="${item ? item.par : 1}" />
+          </div>
+          <div class="field">
+            <label>Ποσότητα αγοράς</label>
+            <input type="number" min="0" id="f-buyqty" value="${item ? item.buyQty : 1}" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="f-cancel">Ακύρωση</button>
+          <button class="btn btn-primary" id="f-save">${isEdit ? 'Αποθήκευση' : 'Προσθήκη'}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    document.getElementById('f-cancel').onclick = closeModal;
+    backdrop.addEventListener('click', (e) => { if(e.target === backdrop) closeModal(); });
+    document.getElementById('f-save').onclick = () => {
+      const data = {
+        name: document.getElementById('f-name').value.trim(),
+        category: document.getElementById('f-category').value,
+        unit: document.getElementById('f-unit').value.trim() || 'τεμ.',
+        current: document.getElementById('f-current').value,
+        par: document.getElementById('f-par').value,
+        buyQty: document.getElementById('f-buyqty').value
+      };
+      if(!data.name){ document.getElementById('f-name').focus(); return; }
+      if(isEdit){ updateItem(editingId, data); } else { addItem(data); }
+      closeModal();
+    };
+  }
+
+  function closeModal(){
+    const b = document.getElementById('modalBackdrop');
+    if(b) b.remove();
+    editingId = null;
+  }
+
+  function openSyncModal(){
+    const current = getSyncUrl();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop show';
+    backdrop.id = 'modalBackdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h3>Συγχρονισμός με Google Sheets</h3>
+        <p style="color:var(--muted); font-size:12.5px; margin-top:-8px; margin-bottom:14px;">
+          Επικόλλησε εδώ το Web App URL από το Google Apps Script σου (τελειώνει σε /exec).
+        </p>
+        <div class="field">
+          <label>Web App URL</label>
+          <input type="text" id="s-url" value="${current ? escapeAttr(current) : ''}" placeholder="https://script.google.com/macros/s/.../exec" />
+        </div>
+        <p id="s-status" style="font-size:12px; color:var(--muted); min-height:16px;"></p>
+        <div class="modal-actions">
+          ${current ? '<button class="btn btn-ghost" id="s-clear">Απενεργοποίηση</button>' : ''}
+          <button class="btn btn-ghost" id="s-cancel">Ακύρωση</button>
+          <button class="btn btn-primary" id="s-save">Αποθήκευση</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    document.getElementById('s-cancel').onclick = closeModal;
+    backdrop.addEventListener('click', (e) => { if(e.target === backdrop) closeModal(); });
+
+    const clearBtn = document.getElementById('s-clear');
+    if(clearBtn){
+      clearBtn.onclick = () => {
+        setSyncUrl('');
+        closeModal();
+        loadItems();
+      };
+    }
+
+    document.getElementById('s-save').onclick = async () => {
+      const url = document.getElementById('s-url').value.trim();
+      const statusEl = document.getElementById('s-status');
+      if(!url){ document.getElementById('s-url').focus(); return; }
+      statusEl.textContent = 'Έλεγχος σύνδεσης…';
+      statusEl.style.color = 'var(--muted)';
+      try{
+        await jsonpFetch(url, 8000);
+        setSyncUrl(url);
+        closeModal();
+        await loadItems();
+      }catch(e){
+        statusEl.textContent = '⚠ Δεν μπόρεσα να συνδεθώ σε αυτό το URL. Βεβαιώσου ότι έκανες ξανά Deploy (New version) με τον ενημερωμένο κώδικα και ότι έχει πρόσβαση "Anyone".';
+        statusEl.style.color = 'var(--empty)';
+      }
+    };
+  }
+
+  function openPurchaseModal(item){
+    const today = new Date().toISOString().slice(0,10);
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop show';
+    backdrop.id = 'modalBackdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h3>Καταγραφή αγοράς</h3>
+        <p style="color:var(--muted); font-size:12.5px; margin-top:-8px;">${escapeHtml(item.name)}</p>
+        <div class="field">
+          <label>Ημερομηνία</label>
+          <input type="date" id="p-date" value="${today}" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Ποσότητα (${escapeHtml(item.unit)})</label>
+            <input type="number" min="0" step="1" id="p-qty" value="${item.buyQty}" />
+          </div>
+          <div class="field">
+            <label>Συνολική τιμή (€)</label>
+            <input type="number" min="0" step="0.01" id="p-total" placeholder="π.χ. 3.50" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="p-cancel">Ακύρωση</button>
+          <button class="btn btn-primary" id="p-save">Καταγραφή</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    document.getElementById('p-cancel').onclick = closeModal;
+    backdrop.addEventListener('click', (e) => { if(e.target === backdrop) closeModal(); });
+    document.getElementById('p-save').onclick = () => {
+      const date = document.getElementById('p-date').value || today;
+      const qty = document.getElementById('p-qty').value;
+      const total = document.getElementById('p-total').value;
+      if(!total || Number(total) <= 0){ document.getElementById('p-total').focus(); return; }
+      logPurchase(item.id, { date, qty, total });
+      closeModal();
+    };
+  }
+
+  function openHistoryModal(item){
+    pruneHistory(item);
+    saveItems();
+    const history = [...(item.priceHistory || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
+    const avg = avgUnitPrice(item);
+    const last = lastPurchase(item);
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop show';
+    backdrop.id = 'modalBackdrop';
+    backdrop.innerHTML = `
+      <div class="modal" style="max-width:440px;">
+        <h3>Ιστορικό τιμών — ${escapeHtml(item.name)}</h3>
+        <p style="color:var(--muted); font-size:12px; margin-top:-10px; margin-bottom:14px;">Τελευταίοι 24 μήνες</p>
+        ${history.length ? `
+          <div class="history-summary">
+            <span>Τελευταία τιμή: <b>${formatMoney(last.unit)}</b> / ${escapeHtml(item.unit)}</span>
+            <span>Μέση τιμή: <b>${formatMoney(avg)}</b> / ${escapeHtml(item.unit)}</span>
+          </div>
+          <div class="history-list">
+            ${history.map(e => `
+              <div class="history-row">
+                <span class="h-date">${formatDate(e.date)}</span>
+                <span class="h-qty">×${e.qty}</span>
+                <span class="h-unit">${formatMoney(e.unit)}</span>
+                <span class="h-total">σύνολο ${formatMoney(e.total)}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : `<div class="history-empty">Δεν υπάρχουν καταγεγραμμένες αγορές ακόμη.</div>`}
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="h-buy">+ Νέα αγορά</button>
+          <button class="btn btn-ghost" id="h-close">Κλείσιμο</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(backdrop);
+
+    document.getElementById('h-close').onclick = closeModal;
+    backdrop.addEventListener('click', (e) => { if(e.target === backdrop) closeModal(); });
+    document.getElementById('h-buy').onclick = () => { closeModal(); openPurchaseModal(item); };
+  }
+
+  function escapeAttr(s){
+    return String(s).replace(/"/g, '&quot;');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  }
+
+  function render(){
+    if(!loaded){
+      appEl.innerHTML = '<div class="loading">Φόρτωση αποθήκης…</div>';
+      return;
+    }
+
+    const filtered = items.filter(i => i.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const lowItems = items.filter(i => statusOf(i) !== 'ok');
+
+    let html = `
+      <div class="header">
+        <div>
+          <h1>Home Inventory</h1>
+          <p class="sub">${items.length} είδη · ${lowItems.length} χρειάζονται ανανέωση</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-ghost" id="btnSync" title="Ρυθμίσεις συγχρονισμού">⚙</button>
+          <button class="btn btn-primary" id="btnAdd">+ Νέο είδος</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input class="search" id="searchInput" placeholder="Αναζήτηση είδους…" value="${escapeAttr(searchTerm)}" />
+      </div>
+
+      <div class="shopping-banner ${lowItems.length ? 'show' : ''}">
+        <p class="title"><span>🛒 Λίστα για ψώνια</span><span>${lowItems.length} ${lowItems.length===1?'είδος':'είδη'}</span></p>
+        <ul>
+          ${lowItems.map(i => {
+            const last = lastPurchase(i);
+            const avg = avgUnitPrice(i);
+            const priceBit = last ? ` · τελ. ${formatMoney(last.unit)} · μέση ${formatMoney(avg)}` : '';
+            return `<li>${escapeHtml(i.name)} <b>×${i.buyQty}</b><span class="price-bit" style="color:var(--muted);">${priceBit}</span></li>`;
+          }).join('')}
+        </ul>
+      </div>
+    `;
+
+    if(items.length === 0){
+      html += `
+        <div class="empty-state">
+          <div class="big">Η αποθήκη είναι άδεια</div>
+          <p>Πρόσθεσε το πρώτο σου αναλώσιμο για να ξεκινήσεις την παρακολούθηση.</p>
+        </div>
+      `;
+    } else if(filtered.length === 0){
+      html += `<div class="empty-state"><div class="big">Καμία αντιστοιχία</div><p>Δοκίμασε άλλον όρο αναζήτησης.</p></div>`;
+    } else {
+      CATEGORIES.forEach(cat => {
+        const catItems = filtered.filter(i => i.category === cat);
+        if(catItems.length === 0) return;
+        html += `
+          <div class="category">
+            <div class="category-label">
+              <span class="bracket">[ ${cat} ]</span>
+              <span class="count">${catItems.length}</span>
+            </div>
+            ${catItems.map(i => renderRow(i)).join('')}
+          </div>
+        `;
+      });
+    }
+
+    const syncUrl = getSyncUrl();
+    const footerMsg = syncUrl
+      ? (syncStatus === 'error' ? '⚠ Πρόβλημα συγχρονισμού με Google Sheets — χρήση τοπικού αντιγράφου' : '✓ Συγχρονισμένο με Google Sheets')
+      : (hasAccountStorage ? 'Τα δεδομένα συγχρονίζονται με τον λογαριασμό σου' : 'Τα δεδομένα αποθηκεύονται τοπικά σε αυτόν τον browser');
+    html += `<p class="footer-note">${footerMsg}</p>`;
+
+    appEl.innerHTML = html;
+
+    document.getElementById('btnAdd').onclick = () => openModal(null);
+    document.getElementById('btnSync').onclick = () => openSyncModal();
+    const si = document.getElementById('searchInput');
+    si.oninput = (e) => { searchTerm = e.target.value; render(); };
+    si.focus();
+    si.setSelectionRange(si.value.length, si.value.length);
+
+    items.forEach(i => {
+      const dec = document.getElementById('dec-' + i.id);
+      const inc = document.getElementById('inc-' + i.id);
+      const edit = document.getElementById('edit-' + i.id);
+      const del = document.getElementById('del-' + i.id);
+      const buy = document.getElementById('buy-' + i.id);
+      const price = document.getElementById('price-' + i.id);
+      if(dec) dec.onclick = () => changeStock(i.id, -1);
+      if(inc) inc.onclick = () => changeStock(i.id, 1);
+      if(edit) edit.onclick = () => openModal(i);
+      if(del) del.onclick = () => { if(confirm('Διαγραφή "' + i.name + '";')) deleteItem(i.id); };
+      if(buy) buy.onclick = () => openPurchaseModal(i);
+      if(price) price.onclick = () => openHistoryModal(i);
+    });
+  }
+
+  function renderRow(item){
+    const s = statusOf(item);
+    const barMax = Math.max(item.par * 2, item.current, 1);
+    const fillPct = Math.min((item.current / barMax) * 100, 100);
+    const thresholdPct = Math.min((item.par / barMax) * 100, 100);
+    const fillColor = s === 'ok' ? 'var(--ok)' : s === 'low' ? 'var(--low)' : 'var(--empty)';
+    const last = lastPurchase(item);
+
+    return `
+      <div class="item-row">
+        <div class="item-info">
+          <div class="name">${escapeHtml(item.name)}</div>
+          <div class="gauge">
+            <div class="gauge-fill" style="width:${fillPct}%; background:${fillColor};"></div>
+            <div class="gauge-threshold" style="left:${thresholdPct}%;"></div>
+          </div>
+          <button class="price-info" id="price-${item.id}">
+            ${last ? `Τελευταία τιμή: ${formatMoney(last.unit)} · ${formatDate(last.date)}` : `<span class="no-price">Καμία καταγεγραμμένη τιμή</span>`}
+          </button>
+        </div>
+        <div class="stepper">
+          <button id="dec-${item.id}">−</button>
+          <span class="val">${item.current}</span>
+          <button id="inc-${item.id}">+</button>
+          <span class="unit">${escapeHtml(item.unit)}</span>
+        </div>
+        <span class="status-pill status-${s}">${statusLabel(s)}</span>
+        <div class="row-actions">
+          <button class="icon-btn buy-btn" id="buy-${item.id}" title="Καταγραφή αγοράς">🧾</button>
+          <button class="icon-btn" id="edit-${item.id}" title="Επεξεργασία">✎</button>
+          <button class="icon-btn" id="del-${item.id}" title="Διαγραφή">✕</button>
+        </div>
+      </div>
+    `;
+  }
+
+  loadItems();
+})();
+</script>
